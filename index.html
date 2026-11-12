@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>童画天赋实验室 | AI 一分钟发现孩子的艺术天赋</title>
+  <meta name="description" content="上传孩子的一幅画 + 30 秒问卷，AI 生成六维天赋报告与专属培养建议。照片仅本地分析，不上传任何服务器。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ① 欢迎页 -->
+  <section id="screen-welcome" class="screen active">
+    <div class="hero">
+      <div class="logo-emoji">🎨</div>
+      <div class="brand">童画天赋实验室</div>
+      <h1>孩子的画里<br>藏着 ta 的天赋密码</h1>
+      <p class="hero-sub">上传一幅画 + 30 秒问卷<br>AI 生成专属天赋报告与培养建议</p>
+      <div class="badges">
+        <span>⏱ 1 分钟出报告</span>
+        <span>🔒 照片仅本地分析</span>
+        <span>📊 六维天赋画像</span>
+      </div>
+      <button id="btn-start" class="btn-primary">免费开始测评 →</button>
+      <p class="footnote">本报告为娱乐性测评，仅供参考</p>
+    </div>
+  </section>
+
+  <!-- ② 基本信息 -->
+  <section id="screen-info" class="screen">
+    <div class="panel">
+      <h2>先认识一下小艺术家</h2>
+      <div class="field">
+        <label>宝贝昵称（可不填）</label>
+        <input id="nickname-input" type="text" maxlength="10" placeholder="如：朵朵">
+      </div>
+      <div class="field">
+        <label>宝贝年龄</label>
+        <select id="age-select"></select>
+      </div>
+      <button id="btn-info-next" class="btn-primary">开始答题 →</button>
+    </div>
+  </section>
+
+  <!-- ③ 问卷 -->
+  <section id="screen-quiz" class="screen">
+    <div class="panel">
+      <div class="quiz-top">
+        <button id="btn-quiz-back" class="btn-back">‹ 上一题</button>
+        <span id="quiz-progress-text" class="quiz-progress-text"></span>
+      </div>
+      <div class="progress-track"><div id="quiz-progress-bar" class="progress-bar"></div></div>
+      <h2 id="quiz-question" class="quiz-question"></h2>
+      <div id="quiz-options" class="quiz-options"></div>
+      <p class="footnote center">凭日常观察选择，不确定就凭直觉</p>
+    </div>
+  </section>
+
+  <!-- ④ 画作上传 -->
+  <section id="screen-upload" class="screen">
+    <div class="panel">
+      <h2>有宝贝的画作吗？</h2>
+      <p class="panel-sub">拍一张上传，AI 直接分析画面色彩与笔触，报告更精准</p>
+      <div id="art-input-wrap" class="upload-area">
+        <div id="upload-hint">
+          <div class="upload-icon">🖼️</div>
+          <div>点击上传宝贝的画作</div>
+          <div class="upload-tip">支持拍照 / 相册选取</div>
+        </div>
+        <div id="art-preview-wrap" style="display:none">
+          <img id="art-preview" alt="画作预览">
+          <div class="upload-tip">点击可更换</div>
+        </div>
+      </div>
+      <input id="art-input" type="file" accept="image/*" style="display:none">
+      <p class="privacy-note">🔒 照片只在你手机里分析，不会上传到任何服务器</p>
+      <button id="btn-analyze" class="btn-primary" style="display:none">开始 AI 分析 →</button>
+      <button id="btn-skip" class="btn-ghost">跳过，仅用问卷分析</button>
+    </div>
+  </section>
+
+  <!-- ⑤ 分析中 -->
+  <section id="screen-analyzing" class="screen">
+    <div class="panel center-panel">
+      <div class="loader"></div>
+      <p id="analyze-step-text" class="analyze-text">正在分析…</p>
+      <div class="progress-track"><div id="analyze-progress-bar" class="progress-bar" style="width:0"></div></div>
+    </div>
+  </section>
+
+  <!-- ⑥ 结果页 -->
+  <section id="screen-result" class="screen">
+    <div class="panel">
+      <h2 id="result-title" class="result-title"></h2>
+      <div id="result-badge" class="result-badge"></div>
+      <div id="result-tagline" class="result-tagline"></div>
+
+      <div class="score-wrap">
+        <div id="score-ring" class="score-ring">
+          <div class="score-inner">
+            <span id="result-score-num" class="score-num"></span>
+            <span class="score-label">天赋指数</span>
+          </div>
+        </div>
+      </div>
+      <p id="result-percentile" class="result-percentile"></p>
+
+      <canvas id="radar-canvas" class="radar-canvas"></canvas>
+
+      <h3 class="section-title">天赋解读</h3>
+      <div id="type-interpretation" class="type-interpretation"></div>
+
+      <div id="art-report" class="art-report">
+        <h3 class="section-title">🎨 画面特征报告</h3>
+        <div id="art-palette" class="art-palette"></div>
+        <div id="art-stats" class="art-stats"></div>
+      </div>
+
+      <div id="no-art-tip" class="no-art-tip">
+        🖼️ 上传宝贝的画作，可解锁<b>画面级精准分析</b>
+        <button id="btn-add-art" class="btn-mini">补充上传</button>
+      </div>
+
+      <h3 class="section-title">六维天赋画像</h3>
+      <div id="dim-cards" class="dim-cards"></div>
+
+      <div class="result-actions">
+        <button id="btn-share" class="btn-primary">🖼️ 生成分享卡</button>
+        <button id="btn-retest" class="btn-ghost">再测一次</button>
+      </div>
+
+      <p class="footnote center">© 童画天赋实验室 · AI 本地分析生成<br>本报告为娱乐性测评，仅供参考，不构成专业教育建议</p>
+    </div>
+  </section>
+
+</div>
+<script src="js/data.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/analyze.js"></script>
+<script src="js/radar.js"></script>
+<script src="js/share.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
